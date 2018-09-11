@@ -1,35 +1,24 @@
 package cn.levey.pancakedemo1;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.os.Bundle;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.BounceInterpolator;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import cn.levey.pancakedemo1.data.RvAdapter;
 import cn.levey.pancakedemo1.data.RvItemData;
-import cn.levey.pancakedemo1.pancake.PancakeLayout;
 import cn.levey.pancakedemo1.pancake.OnPancakeListener;
+import cn.levey.pancakedemo1.pancake.PancakeLayout;
 import cn.levey.pancakedemo1.utils.ScreenUtil;
 
 
@@ -48,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int layoutMenuContainerHeight =  460;
     private static final int layoutMenuHeaderHeight =  100;
 
-    private boolean isFirstVisiable;
+    private boolean isFirstVisible;
 
 
     @Override
@@ -94,12 +83,12 @@ public class MainActivity extends AppCompatActivity {
         layoutPancake.setOnPancakeListener(new OnPancakeListener() {
             @Override
             public void open() {
-               // sss(menu3,100f);
+
             }
 
             @Override
             public void close() {
-              //  sss(menu3,0f);
+
             }
 
             @Override
@@ -113,18 +102,32 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                 if (dy > 0) {
+                     if(layoutPancake.isContainerOpen()){
+                         System.out.println("layoutPancake = layoutPancake");
+                         layoutPancake.close();
+                     }
+                 }
+            }
+        });
+
 
         ViewTreeObserver viewTreeObserver = layoutPancake.getViewTreeObserver();
         viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                if(!isFirstVisiable) {
+                if(!isFirstVisible) {
                     addMenu(menu1,"menu1");
                     addMenu(menu2,"menu2");
                     addMenu(menu3,"menu3");
                     addMenu(menu4,"menu4");
                     addMenu(menu5,"menu5");
-                    isFirstVisiable = true;
+                    isFirstVisible = true;
                 }
                 return true;
             }
@@ -133,19 +136,57 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+//    private boolean isClickEvent = false;
+//
+//    private float yDown = 0f;
+//    private float yUp = 0f;
 
-
-    private void addMenu(View menu, final String name){
+    private void addMenu(final View menu, final String name){
         int left = menu.getLeft();
         int top = menu.getTop();
         map.put(menu.getId(),new Integer[]{left,top});
 
-        menu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"点击了 " + name,Toast.LENGTH_SHORT).show();
-            }
-        });
+
+
+
+//        menu.setOnTouchListener(new View.OnTouchListener() {
+//            @SuppressLint("ClickableViewAccessibility")
+//            @Override
+//            public boolean onTouch(View view, MotionEvent ev) {
+//
+//                switch (ev.getAction()){
+//                    case MotionEvent.ACTION_DOWN:
+//                        yDown = ev.getRawY();
+//                        System.out.println("onTouch ACTION_DOWN");
+//                        //isClickEvent = true;
+//                        view.dispatchTouchEvent(ev);
+//                        return true;
+//
+//                    case MotionEvent.ACTION_MOVE:
+//                        System.out.println("onTouch ACTION_MOVE");
+//                        //isClickEvent = false;
+//                        view.dispatchTouchEvent(ev);
+//                        return true;
+//
+//                    case MotionEvent.ACTION_UP:
+//
+//                        yUp = ev.getRawY();
+//                        System.out.println("onTouch ACTION_UP = ");
+//
+//                        if(Math.abs(yUp - yDown) < 100){
+//                            //if(isClickEvent){
+//                                // menu.performClick();
+//                                Toast.makeText(getApplicationContext(),"点击了 " + name,Toast.LENGTH_SHORT).show();
+//                                view.dispatchTouchEvent(ev);
+//                                return true;
+//                            //}
+//                        }else {
+//                            return true;
+//                        }
+//                }
+//                return true;
+//            }
+//        });
 
     }
 

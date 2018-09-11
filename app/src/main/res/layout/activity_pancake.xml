@@ -29,7 +29,7 @@
                 android:baselineAligned="false"
                 android:paddingTop="15dp">
 
-                <LinearLayout
+                <cn.levey.pancakedemo1.pancake.MenuItemView
                     android:id="@+id/menu_1"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -48,7 +48,7 @@
                         android:layout_height="wrap_content"
                         android:text="标题1"/>
 
-                </LinearLayout>
+                </cn.levey.pancakedemo1.pancake.MenuItemView>
 
                 <LinearLayout
                     android:id="@+id/menu_2"
