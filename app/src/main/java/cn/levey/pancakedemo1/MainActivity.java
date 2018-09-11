@@ -1,129 +1,175 @@
 package cn.levey.pancakedemo1;
 
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.BounceInterpolator;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import cn.levey.pancakedemo1.data.RvAdapter;
+import cn.levey.pancakedemo1.data.RvItemData;
+import cn.levey.pancakedemo1.pancake.PancakeLayout;
+import cn.levey.pancakedemo1.pancake.OnPancakeListener;
+import cn.levey.pancakedemo1.utils.ScreenUtil;
+
+
+/**
+ * Created by Levey on 2018/9/10 15:42.
+ * e-mail: m@levey.cn
+ */
 
 public class MainActivity extends AppCompatActivity {
 
+    private PancakeLayout layoutPancake;
+    private View menu1,menu2,menu3,menu4,menu5;
 
-    private int mHiddenViewMeasuredHeight = 1200;
+    private SparseArray<Integer[]> map = new SparseArray<>();
 
-    private static final float MIN_MOVE = 200f;
+    private static final int layoutMenuContainerHeight =  460;
+    private static final int layoutMenuHeaderHeight =  100;
 
-    private boolean IS_PANCAKE_OPEN = false;
-
-    private LinearLayout layoutPancake;
-    private RecyclerView recyclerView;
+    private boolean isFirstVisiable;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        recyclerView = findViewById(R.id.recycler_view);
+        setContentView(R.layout.activity_pancake);
         layoutPancake = findViewById(R.id.layout_pancake);
+
+
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+
         LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
         RvAdapter adapter = new RvAdapter(R.layout.rv_item_data, getFakeList());
         recyclerView.setAdapter(adapter);
-        setGestureListener();
+
+        layoutPancake.setLayoutContainerMaxHeight(ScreenUtil.dp2px(layoutMenuContainerHeight));
+        layoutPancake.setLayoutContainerMinHeight(ScreenUtil.dp2px(layoutMenuHeaderHeight));
 
 
-    }
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+
+                if(position % 2 ==0){
+                    layoutPancake.open();
+                }else {
+                    layoutPancake.close();
+                }
+            }
+        });
+        menu1 = findViewById(R.id.menu_1);
+        menu2 = findViewById(R.id.menu_2);
+        menu3 = findViewById(R.id.menu_3);
+        menu4 = findViewById(R.id.menu_4);
+        menu5 = findViewById(R.id.menu_5);
 
 
 
-    private float mPosY,mCurPosY;
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void setGestureListener(){
-        layoutPancake.setOnTouchListener(new View.OnTouchListener() {
+
+        layoutPancake.setOnPancakeListener(new OnPancakeListener() {
+            @Override
+            public void open() {
+               // sss(menu3,100f);
+            }
 
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                switch (event.getAction()) {
+            public void close() {
+              //  sss(menu3,0f);
+            }
 
-                    case MotionEvent.ACTION_DOWN:
-                        mPosY = event.getY();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        mCurPosY = event.getY();
+            @Override
+            public void process(boolean isMoveUp, float process) {
 
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if (mCurPosY - mPosY > 0
-                                && (Math.abs(mCurPosY - mPosY) > MIN_MOVE)) {
-                            //向下滑動
-                            if(!IS_PANCAKE_OPEN){
-                                animateRun();
-                            }
+                moveViewByLayout(menu1,75 * process,250 * process);
+                moveViewByLayout(menu2,15 * process,50 * process);
+                moveViewByLayout(menu4,-15 * process,50 * process);
+                moveViewByLayout(menu5,-75 * process,250 * process);
+            }
 
-                        } else if (mCurPosY - mPosY < 0
-                                && (Math.abs(mCurPosY - mPosY) > MIN_MOVE)) {
-                            //向上滑动
-                            if(IS_PANCAKE_OPEN){
-                                animateRun();
-                            }
-                        }
+        });
 
-                        break;
+
+        ViewTreeObserver viewTreeObserver = layoutPancake.getViewTreeObserver();
+        viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                if(!isFirstVisiable) {
+                    addMenu(menu1,"menu1");
+                    addMenu(menu2,"menu2");
+                    addMenu(menu3,"menu3");
+                    addMenu(menu4,"menu4");
+                    addMenu(menu5,"menu5");
+                    isFirstVisiable = true;
                 }
                 return true;
             }
-
         });
+
+
     }
 
 
-    private void animateRun() {
-        int origHeight = layoutPancake.getHeight();
-        ValueAnimator animator;
-        if(IS_PANCAKE_OPEN){
-            animator = createDropAnimator(layoutPancake, origHeight, origHeight - mHiddenViewMeasuredHeight);
-        }else {
-            animator = createDropAnimator(layoutPancake, origHeight, origHeight + mHiddenViewMeasuredHeight);
-        }
-        animator.start();
-        this.IS_PANCAKE_OPEN = !IS_PANCAKE_OPEN;
 
-    }
-    private ValueAnimator createDropAnimator(final View v, int start, int end) {
-        ValueAnimator animator = ValueAnimator.ofInt(start, end);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    private void addMenu(View menu, final String name){
+        int left = menu.getLeft();
+        int top = menu.getTop();
+        map.put(menu.getId(),new Integer[]{left,top});
 
+        menu.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator arg0) {
-                int value = (int) arg0.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
-                layoutParams.height = value;
-                v.setLayoutParams(layoutParams);
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"点击了 " + name,Toast.LENGTH_SHORT).show();
             }
         });
-        return animator;
+
     }
 
     private List<RvItemData> getFakeList(){
         List<RvItemData> list = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
             RvItemData item = new RvItemData();
-            item.title = "这是标题 " + (i + 1);
+            item.title = (i % 2 == 0) ? "点我就能打开了"  + (i + 1) : "点一下就关闭" + (i + 1);
             item.content = "这是文章正文内容这是文章正文内容这是文章正文内容这是文章正文内容这是文章正文内容" + (i + 1);
             item.author = "作者" + (i + 1);
             list.add(item);
         }
         return list;
     }
+
+
+    private void moveViewByLayout(View view, float x, float y) {
+        int left,top,right,bottom;
+        left = (int) (map.get(view.getId())[0] + x);
+        top = (int) (map.get(view.getId())[1] + y);
+        right = left + view.getWidth();
+        bottom = top + view.getHeight();
+        view.layout(left, top, right, bottom);
+    }
+
+
 }

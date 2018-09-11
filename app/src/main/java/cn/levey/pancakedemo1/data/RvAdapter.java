@@ -1,4 +1,4 @@
-package cn.levey.pancakedemo1;
+package cn.levey.pancakedemo1.data;
 
 import android.support.annotation.Nullable;
 
@@ -6,6 +6,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
 import java.util.List;
+
+import cn.levey.pancakedemo1.R;
 
 /**
  * Created by Levey on 2018/4/20 11:23.

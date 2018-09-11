@@ -1,4 +1,4 @@
-package cn.levey.pancakedemo1;
+package cn.levey.pancakedemo1.data;
 
 /**
  * Created by Levey on 2018/4/20 11:32.
