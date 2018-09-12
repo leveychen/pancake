@@ -4,8 +4,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 /**
  * Created by Levey on 2018/9/11 10:41.
@@ -29,39 +29,35 @@ public class MenuItemView extends LinearLayout {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    private float yDown = 0f;
-    private float yUp = 0f;
+    private float yDown,yUp;
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        switch (ev.getAction()){
+    public boolean onTouchEvent(MotionEvent event) {
+
+        getParent().requestDisallowInterceptTouchEvent(true);
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                yDown = ev.getRawY();
-                System.out.println("dispatchTouchEvent ACTION_DOWN");
-                //isClickEvent = true;
 
-                return super.dispatchTouchEvent(ev);
+                yDown = (int) event.getRawY();
+
+                System.out.println("---ACTION_DOWN--");
+                break;
+
             case MotionEvent.ACTION_MOVE:
-                System.out.println("dispatchTouchEvent ACTION_MOVE");
-                //isClickEvent = false;
-                return super.dispatchTouchEvent(ev);
+                System.out.println("---ACTION_MOVE--");
 
+                break;
             case MotionEvent.ACTION_UP:
 
-                yUp = ev.getRawY();
-                System.out.println("dispatchTouchEvent ACTION_UP = ");
+                yUp = (int) event.getRawY();
+                System.out.println("---ACTION_UP--");
 
-                if(Math.abs(yUp - yDown) < 100){
-                    //if(isClickEvent){
-                    // menu.performClick();
-                    Toast.makeText(getContext(),"点击了 ",Toast.LENGTH_SHORT).show();
+                if (Math.abs(yUp - yDown) > 30) {
+                    System.out.println("---ACTION_UP-- 点击了");
                     return true;
-                    //}
-                }else {
-                    return super.dispatchTouchEvent(ev);
                 }
         }
-        return super.dispatchTouchEvent(ev);
+        return ((View) getParent()).onTouchEvent(event);
 
     }
 }

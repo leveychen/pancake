@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     private PancakeLayout layoutPancake;
     private View menu1,menu2,menu3,menu4,menu5;
+//    private View menu2,menu3,menu4,menu5;
+//    private MenuItemView menu1;
 
     private SparseArray<Integer[]> map = new SparseArray<>();
 
@@ -133,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        layoutPancake.setRecyclerView(recyclerView);
+//        layoutPancake.setScrollEvent(recyclerView);
+//
 
     }
 
@@ -141,52 +147,19 @@ public class MainActivity extends AppCompatActivity {
 //    private float yDown = 0f;
 //    private float yUp = 0f;
 
+    private float x1,y1,x2,y2;
     private void addMenu(final View menu, final String name){
         int left = menu.getLeft();
         int top = menu.getTop();
         map.put(menu.getId(),new Integer[]{left,top});
 
 
-
-
-//        menu.setOnTouchListener(new View.OnTouchListener() {
-//            @SuppressLint("ClickableViewAccessibility")
-//            @Override
-//            public boolean onTouch(View view, MotionEvent ev) {
-//
-//                switch (ev.getAction()){
-//                    case MotionEvent.ACTION_DOWN:
-//                        yDown = ev.getRawY();
-//                        System.out.println("onTouch ACTION_DOWN");
-//                        //isClickEvent = true;
-//                        view.dispatchTouchEvent(ev);
-//                        return true;
-//
-//                    case MotionEvent.ACTION_MOVE:
-//                        System.out.println("onTouch ACTION_MOVE");
-//                        //isClickEvent = false;
-//                        view.dispatchTouchEvent(ev);
-//                        return true;
-//
-//                    case MotionEvent.ACTION_UP:
-//
-//                        yUp = ev.getRawY();
-//                        System.out.println("onTouch ACTION_UP = ");
-//
-//                        if(Math.abs(yUp - yDown) < 100){
-//                            //if(isClickEvent){
-//                                // menu.performClick();
-//                                Toast.makeText(getApplicationContext(),"点击了 " + name,Toast.LENGTH_SHORT).show();
-//                                view.dispatchTouchEvent(ev);
-//                                return true;
-//                            //}
-//                        }else {
-//                            return true;
-//                        }
-//                }
-//                return true;
-//            }
-//        });
+       menu.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               Toast.makeText(getApplicationContext(),"CLICK " + name,Toast.LENGTH_SHORT).show();
+           }
+       });
 
     }
 

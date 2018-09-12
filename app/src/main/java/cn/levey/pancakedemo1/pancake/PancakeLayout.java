@@ -3,6 +3,7 @@ package cn.levey.pancakedemo1.pancake;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -172,7 +173,7 @@ public class PancakeLayout extends RelativeLayout implements
      * @param bindView
      *            需要绑定的View对象。
      */
-    private void setScrollEvent(View bindView) {
+    public void setScrollEvent(View bindView) {
         mBindView = bindView;
         mBindView.setOnTouchListener(this);
     }
@@ -438,7 +439,7 @@ public class PancakeLayout extends RelativeLayout implements
             View layoutMenu = getChildAt(0);
             upMenuLayoutParams = (MarginLayoutParams) layoutMenu
                     .getLayoutParams();
-            setScrollEvent(layoutMenu);
+            setScrollEvent(getRootView());
             // 获取内容布局对象
             contentLayout = getChildAt(1);
             contentLayout.setVisibility(VISIBLE);
@@ -464,5 +465,44 @@ public class PancakeLayout extends RelativeLayout implements
 
     public void close(){
         closeContainer();
+    }
+
+
+
+
+    private RecyclerView recyclerView;
+    //抛出方法，传入RecyclerView
+    public void setRecyclerView(RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
+    }
+
+    private float iYDown = 0f;
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        int action = ev.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                iYDown = ev.getRawY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float iYUp = ev.getRawY();
+                //当下拉幅度超过最小滑动值，且 Menu容器未打开，RecyclerView 处于顶部时出发Menu打开
+                if(iYUp - iYDown > minScrollDistance && !isContainerOpen && recyclerView != null && !recyclerView.canScrollVertically(-1)) {
+                    openContainer();
+                    return true;
+                }
+            break;
+            default:
+                break;
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    @Override //销毁RV
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if(recyclerView != null){
+            recyclerView = null;
+        }
     }
 }
